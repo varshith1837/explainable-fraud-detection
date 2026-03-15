@@ -1,0 +1,10 @@
+{
+  "precision": 0.8966,
+  "recall": 0.7959,
+  "f1_score": 0.8432,
+  "roc_auc": 0.9574,
+  "total_transactions": 284807,
+  "fraud_cases": 492,
+  "normal_cases": 284315,
+  "fraud_ratio_pct": 0.1727
+}

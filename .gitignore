@@ -1,0 +1,11 @@
+venv/
+__pycache__/
+*.pyc
+
+# Do NOT commit the 150MB dataset! GitHub will block it.
+data/creditcard.csv
+
+# Keep models & static generated plots so the deployed app works
+models/X_test.pkl
+models/y_test.pkl
+.env

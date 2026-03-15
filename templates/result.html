@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prediction Result — Fraud Detection Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header>
+    <div class="container">
+        <h1>🔍 Prediction Result</h1>
+        <p class="subtitle">SHAP-based explanation for Transaction #{{ tx_index }}</p>
+    </div>
+</header>
+
+<!-- ─── Main Content ─── -->
+<main class="container">
+
+    <!-- Prediction Badge -->
+    <section class="card result-hero" id="prediction-result">
+        <div class="badge {{ 'badge-fraud' if pred_class == 'Fraud' else 'badge-normal' }}">
+            {{ pred_class | upper }}
+        </div>
+        <div class="result-meta">
+            <div><strong>Confidence:</strong> {{ confidence }}%</div>
+            <div><strong>Fraud Probability:</strong> {{ fraud_prob }}%</div>
+            <div><strong>Normal Probability:</strong> {{ normal_prob }}%</div>
+            <div class="actual-label"><strong>Actual Label:</strong>
+                <span class="{{ 'text-fraud' if actual_label == 'Fraud' else 'text-normal' }}">{{ actual_label }}</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top Contributing Features -->
+    <section class="card" id="top-features">
+        <h2>Top Contributing Features</h2>
+        <p class="card-desc">Features ranked by absolute SHAP value — positive values push toward Fraud, negative toward Normal.</p>
+        <table class="feature-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Feature</th>
+                    <th>SHAP Value</th>
+                    <th>Direction</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for name, val in top_features %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ name }}</td>
+                    <td>{{ "%+.4f" | format(val) }}</td>
+                    <td>
+                        {% if val > 0 %}
+                        <span class="dir-fraud">→ Fraud</span>
+                        {% else %}
+                        <span class="dir-normal">→ Normal</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Local SHAP Plot -->
+    <section class="card" id="local-shap">
+        <h2>Local SHAP Explanation</h2>
+        <p class="card-desc">Visual breakdown of how each feature contributed to this specific prediction.</p>
+        <div class="plot-wrap">
+            <img src="{{ url_for('static', filename=shap_plot) }}" alt="Local SHAP Explanation" />
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <div class="nav-actions">
+        <a href="/" class="btn-primary" id="btn-back">← Back to Dashboard</a>
+        <a href="/random_fraud" class="btn-secondary" id="btn-try-fraud">🎲 Try Another Fraud</a>
+    </div>
+
+</main>
+
+<!-- ─── Footer ─── -->
+<footer>
+    <div class="container">
+        <p>Explainable Fraud Detection Dashboard &middot; Built with Flask, scikit-learn &amp; SHAP</p>
+    </div>
+</footer>
+
+</body>
+</html>

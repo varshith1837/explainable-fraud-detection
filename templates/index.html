@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Explainable Fraud Detection Dashboard — ML-powered fraud detection with SHAP interpretability" />
+    <title>Fraud Detection Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+
+<!-- ─── Header ─── -->
+<header>
+    <div class="container">
+        <h1>🔍 Explainable Fraud Detection Dashboard</h1>
+        <p class="subtitle">Machine Learning + SHAP Interpretability for Credit Card Transactions</p>
+    </div>
+</header>
+
+<!-- ─── Main Content ─── -->
+<main class="container">
+
+    <!-- Metrics Cards -->
+    <section class="metrics-grid" id="metrics">
+        <div class="card metric-card">
+            <span class="metric-label">Precision</span>
+            <span class="metric-value">{{ metrics.precision }}</span>
+        </div>
+        <div class="card metric-card">
+            <span class="metric-label">Recall</span>
+            <span class="metric-value">{{ metrics.recall }}</span>
+        </div>
+        <div class="card metric-card">
+            <span class="metric-label">F1-Score</span>
+            <span class="metric-value">{{ metrics.f1_score }}</span>
+        </div>
+        <div class="card metric-card">
+            <span class="metric-label">ROC-AUC</span>
+            <span class="metric-value">{{ metrics.roc_auc }}</span>
+        </div>
+    </section>
+
+    <!-- Dataset Info -->
+    <section class="card info-card" id="dataset-info">
+        <h2>Dataset Summary</h2>
+        <div class="info-grid">
+            <div><strong>Total Transactions</strong><br/>{{ "{:,}".format(metrics.total_transactions) }}</div>
+            <div><strong>Fraud Cases</strong><br/>{{ metrics.fraud_cases }}</div>
+            <div><strong>Normal Cases</strong><br/>{{ "{:,}".format(metrics.normal_cases) }}</div>
+            <div><strong>Fraud Ratio</strong><br/>{{ metrics.fraud_ratio_pct }}%</div>
+        </div>
+    </section>
+
+    <!-- Global SHAP Plot -->
+    <section class="card" id="global-shap">
+        <h2>Global Feature Importance (SHAP)</h2>
+        <p class="card-desc">Shows which features influence fraud predictions the most across all test transactions.</p>
+        <div class="plot-wrap">
+            <img src="{{ url_for('static', filename='shap_global.png') }}" alt="SHAP Global Feature Importance" />
+        </div>
+    </section>
+
+    <!-- Confusion Matrix -->
+    <section class="card" id="confusion-matrix">
+        <h2>Confusion Matrix</h2>
+        <p class="card-desc">Performance of the model on test data — how many frauds and normals were correctly classified.</p>
+        <div class="plot-wrap">
+            <img src="{{ url_for('static', filename='confusion_matrix.png') }}" alt="Confusion Matrix" />
+        </div>
+    </section>
+
+    <!-- Prediction Form -->
+    <section class="card predict-card" id="predict">
+        <h2>Analyze a Transaction</h2>
+        <p class="card-desc">Enter a test-set transaction index (0 – {{ total_test - 1 }}) to get a prediction with a SHAP explanation.</p>
+
+        {% if error %}
+        <div class="alert alert-error">⚠️ {{ error }}</div>
+        {% endif %}
+
+        <form method="POST" action="/predict" class="predict-form">
+            <input
+                type="number"
+                name="tx_index"
+                id="tx_index"
+                min="0"
+                max="{{ total_test - 1 }}"
+                value="{{ request.args.get('prefill', 0) }}"
+                placeholder="e.g. 42"
+                required
+            />
+            <button type="submit" id="btn-predict">Explain Prediction</button>
+        </form>
+        <a href="/random_fraud" class="btn-secondary" id="btn-random-fraud">🎲 Try a Random Fraud Transaction</a>
+    </section>
+
+</main>
+
+<!-- ─── Footer ─── -->
+<footer>
+    <div class="container">
+        <p>Explainable Fraud Detection Dashboard &middot; Built with Flask, scikit-learn &amp; SHAP</p>
+    </div>
+</footer>
+
+</body>
+</html>
